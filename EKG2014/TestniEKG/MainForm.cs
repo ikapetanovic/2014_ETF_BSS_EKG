@@ -15,14 +15,14 @@ namespace TestniEKG
 {
     public partial class MainForm : Form
     {
-
-        private static List<double> napon;
         private static List<double> vrijeme;
+        private static List<double> napon1;
+        private static List<double> napon2;
         
         private static System.Threading.Timer timer;
 
-        private int NumGraphs = 1;        
-        private String CurExample = "TILED_VERTICAL";
+        private int NumGraphs = 2;
+        private String CurExample = "STACKED";
         private String CurColorSchema = "WHITE";
         private PrecisionTimer.Timer mTimer = null;
         private DateTime lastTimerTick = DateTime.Now;
@@ -30,9 +30,10 @@ namespace TestniEKG
         public MainForm()
         {            
             InitializeComponent();
-
-            napon = new List<double>();
+            
             vrijeme = new List<double>();
+            napon1 = new List<double>();
+            napon2 = new List<double>();
 
             display.Smoothing = System.Drawing.Drawing2D.SmoothingMode.None;
             CalcDataGraphs();
@@ -47,12 +48,16 @@ namespace TestniEKG
             mTimer.Start();
         }
 
-        protected override void OnClosed(EventArgs e)
+        private void exitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            mTimer.Stop();
-            mTimer.Dispose();
-            base.OnClosed(e);
+            this.Close();            
         }
+
+        private void MainForm_Load(object sender, EventArgs e)
+        {
+            DajVrijeme("100.txt", EKGFileType.TEXT);            
+        }
+        
         private void OnTimerTick(object sender, EventArgs e)
         {
             if (CurExample == "ANIMATED_AUTO")
@@ -63,30 +68,36 @@ namespace TestniEKG
 
                     for (int j = 0; j < NumGraphs; j++)
                     {
-
-                        CalcSinusFunction_3(display.DataSources[j], j, (float)dt.TotalMilliseconds);
-
+                        //CalcSinusFunction_3(display.DataSources[j], j, (float)dt.TotalMilliseconds);
+                        
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
                     }
 
                     this.Invoke(new MethodInvoker(RefreshGraph));
                 }
                 catch (ObjectDisposedException ex)
                 {
-                    // we get this on closing of form
+                    MessageBox.Show(ex.ToString());
                 }
                 catch (Exception ex)
                 {
-                    Console.Write("exception invoking refreshgraph(): " + ex.Message);
+                    MessageBox.Show(ex.ToString());
                 }
-
-
             }
         }
 
         void IspisiPodatke(DataSource src, int idx, List<double> vrijeme, List<double> napon)
         {
             // for (int i = 0; i < src.Length; i++)
-            for (int i = 0; i < vrijeme.Count; i++)
+
+            double granica = vrijeme.Count;
+            if (napon.Count < granica)
+                granica = napon.Count;
+
+            for (int i = 0; i < granica; i++)
             {
                 src.Samples[i].x = (float)vrijeme[i];
                 src.Samples[i].y = (float)napon[i];
@@ -107,9 +118,8 @@ namespace TestniEKG
             }
             else
             {
-                //int value = (int)(s.Samples[idx].x / 200);
-                double value = (s.Samples[idx].x); // /2000
-                return String.Format("{0:0}", (float)value);
+                double Value = (s.Samples[idx].x);
+                return "" + Value;
             }
         }
 
@@ -121,6 +131,10 @@ namespace TestniEKG
                
         private void openToolStripMenuItem_Click(object sender, EventArgs e)
         {
+
+            napon1.Clear();
+            napon2.Clear();
+
             OpenFileDialog ofd = new OpenFileDialog();
             ofd.Filter = "MIT Arrhythmia File (*.txt, *.dat)|*.txt; *.dat";
 
@@ -133,12 +147,37 @@ namespace TestniEKG
 
                 EKGFileType tip = EKGFileType.BINARY;
                 if (fileExtension == ".txt" || fileExtension == ".TXT")
-                    tip = EKGFileType.TEXT;
+                    tip = EKGFileType.TEXT;  
+                                
+                try
+                {
+                    DajNapon1(filePath, tip);
+                }
+                catch (Exception izuzetak)
+                {
+                    MessageBox.Show(izuzetak.ToString());
+                }
 
-                DajVrijeme(filePath, tip);
-                DajNapon(filePath, tip);
+                try
+                {
+                    DajNapon2(filePath, tip);
+                }
+                catch (Exception izuzetak)
+                {
+                    MessageBox.Show(izuzetak.ToString());
+                }
+
+                if (tip == EKGFileType.TEXT)
+                {                    
+                    for (int i = 0; i < napon1.Count; i++)
+                        napon1[i] = napon1[i] * 1000;                    
+
+                    for (int i = 0; i < napon2.Count; i++)
+                        napon2[i] = napon2[i] * 1000;
+                }
 
                 CalcDataGraphs();
+                
             }
         }
 
@@ -148,7 +187,7 @@ namespace TestniEKG
             try
             {
                 UlazniBuffer.Open(filePath, 0, type);
-                timer.Change(0, 60000); // 30
+                timer.Change(0, 60); // 30
                 Thread.Sleep(10000);
             }
             catch (Exception izuzetak)
@@ -157,13 +196,28 @@ namespace TestniEKG
             }
         }
 
-        public void DajNapon(string filePath, EKGFileType type)
+        public void DajNapon1(string filePath, EKGFileType type)
         {
             timer = new System.Threading.Timer(new TimerCallback(tick1));
             try
             {
                 UlazniBuffer.Open(filePath, 1, type);
-                timer.Change(0, 60000); // 30
+                timer.Change(0, 60); // 30
+                Thread.Sleep(10000); //10000
+            }
+            catch (Exception izuzetak)
+            {
+                MessageBox.Show(izuzetak.ToString());
+            }
+        }
+
+        public void DajNapon2(string filePath, EKGFileType type)
+        {
+            timer = new System.Threading.Timer(new TimerCallback(tick2));
+            try
+            {
+                UlazniBuffer.Open(filePath, 2, type);
+                timer.Change(0, 60); // 30
                 Thread.Sleep(10000); //10000
             }
             catch (Exception izuzetak)
@@ -176,8 +230,8 @@ namespace TestniEKG
         {
             
             //System.Console.WriteLine("tick");
-            double[] signal = new double[20000]; //10
-            for (int i = 0; i < 20000; i++) // 10
+            double[] signal = new double[40000]; //10
+            for (int i = 0; i < 40000; i++) // 10
             {
                 while (!UlazniBuffer.ReadOne(out signal[i])) ;
                 //Console.Write("3");
@@ -192,7 +246,6 @@ namespace TestniEKG
                 }
 
                 vrijeme.Add(signal[i]*1000);
-                //napon.Add(signal[i]*1000);
             } 
         }
 
@@ -200,8 +253,8 @@ namespace TestniEKG
         {
 
             //System.Console.WriteLine("tick");
-            double[] signal = new double[20000]; //10
-            for (int i = 0; i < 20000; i++) // 10
+            double[] signal = new double[40000]; //10
+            for (int i = 0; i < 40000; i++) // 10
             {
                 while (!UlazniBuffer.ReadOne(out signal[i])) ;
                 //Console.Write("3");
@@ -215,7 +268,30 @@ namespace TestniEKG
                     return;
                 }
 
-                napon.Add(signal[i] * 1000);
+                napon1.Add(signal[i]); // 1000
+            }
+        }
+
+        public void tick2(object o) //static
+        {
+
+            //System.Console.WriteLine("tick");
+            double[] signal = new double[40000]; //10
+            for (int i = 0; i < 40000; i++) // 10
+            {
+                while (!UlazniBuffer.ReadOne(out signal[i])) ;
+                //Console.Write("3");
+
+                if (signal[i] == Double.PositiveInfinity)
+                {
+                    //stop the program
+                    timer.Change(Timeout.Infinite, 1);
+                    UlazniBuffer.Clear();
+                    //System.Console.WriteLine("Exiting");
+                    return;
+                }
+
+                napon2.Add(signal[i]);
             }
         }
 
@@ -246,19 +322,20 @@ namespace TestniEKG
             this.SuspendLayout();
 
             display.DataSources.Clear();
-            //display.SetDisplayRangeX(0, 2000);
+            
             display.SetDisplayRangeX(0, 3);
             display.SetGridDistanceX((float)0.2);
+
 
             for (int j = 0; j < NumGraphs; j++)
             {
                 display.DataSources.Add(new DataSource());
 
-                //display.DataSources[j].Name = "Graph " + (j + 1);
-                if (j == 0) display.DataSources[j].Name = "MLII";
-                if (j == 1) display.DataSources[j].Name = "V5";
+                display.DataSources[j].Name = "Graph " + (j + 1);
+                //if (j == 0) display.DataSources[j].Name = "MLII";
+                //if (j == 1) display.DataSources[j].Name = "V5";
 
-                //display.DataSources[j].OnRenderXAxisLabel += RenderXLabel;
+                display.DataSources[j].OnRenderXAxisLabel += RenderXLabel;
 
                 switch (CurExample)
                 {
@@ -267,10 +344,16 @@ namespace TestniEKG
                         display.DataSources[j].Length = vrijeme.Count;
                         display.PanelLayout = PlotterGraphPaneEx.LayoutMode.NORMAL;
                         display.DataSources[j].AutoScaleY = false;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
                         display.DataSources[j].OnRenderYAxisLabel = RenderYLabel;
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);                        
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
+
                         break;
 
                     case "NORMAL_AUTO":
@@ -278,10 +361,17 @@ namespace TestniEKG
                         display.DataSources[j].Length = vrijeme.Count;
                         display.PanelLayout = PlotterGraphPaneEx.LayoutMode.NORMAL;
                         display.DataSources[j].AutoScaleY = true;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
                         display.DataSources[j].OnRenderYAxisLabel = RenderYLabel;
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
+
+
                         break;
 
                     case "STACKED":
@@ -289,9 +379,15 @@ namespace TestniEKG
                         display.PanelLayout = PlotterGraphPaneEx.LayoutMode.STACKED;
                         display.DataSources[j].Length = vrijeme.Count;
                         display.DataSources[j].AutoScaleY = false;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
+
                         break;
 
                     case "VERTICAL_ALIGNED":
@@ -299,9 +395,15 @@ namespace TestniEKG
                         display.PanelLayout = PlotterGraphPaneEx.LayoutMode.VERTICAL_ARRANGED;
                         display.DataSources[j].Length = vrijeme.Count;
                         display.DataSources[j].AutoScaleY = false;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
+
                         break;
 
                     case "VERTICAL_ALIGNED_AUTO":
@@ -309,50 +411,79 @@ namespace TestniEKG
                         display.PanelLayout = PlotterGraphPaneEx.LayoutMode.VERTICAL_ARRANGED;
                         display.DataSources[j].Length = vrijeme.Count;
                         display.DataSources[j].AutoScaleY = true;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
+
                         break;
 
                     case "TILED_VERTICAL":
-                        this.Text = "Tiled Graphs (vertical prefered)";
+                        this.Text = "Tiled Vertical Graphs";
                         display.PanelLayout = PlotterGraphPaneEx.LayoutMode.TILES_VER;
                         display.DataSources[j].Length = vrijeme.Count; // 60
                         display.DataSources[j].AutoScaleY = false;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
 
                         break;
 
                     case "TILED_VERTICAL_AUTO":
-                        this.Text = "Tiled Graphs (vertical prefered) autoscaled";
+                        this.Text = "Tiled Vertical Graphs autoscaled";
                         display.PanelLayout = PlotterGraphPaneEx.LayoutMode.TILES_VER;
                         display.DataSources[j].Length = vrijeme.Count;
                         display.DataSources[j].AutoScaleY = true;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
+
                         break;
 
                     case "TILED_HORIZONTAL":
-                        this.Text = "Tiled Graphs (horizontal prefered)";
+                        this.Text = "Tiled Horizontal Graphs";
                         display.PanelLayout = PlotterGraphPaneEx.LayoutMode.TILES_HOR;
                         display.DataSources[j].Length = vrijeme.Count;
                         display.DataSources[j].AutoScaleY = false;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
+
                         break;
 
                     case "TILED_HORIZONTAL_AUTO":
-                        this.Text = "Tiled Graphs (horizontal prefered) autoscaled";
+                        this.Text = "Tiled Horizontal Graphs autoscaled";
                         display.PanelLayout = PlotterGraphPaneEx.LayoutMode.TILES_HOR;
                         display.DataSources[j].Length = vrijeme.Count;
                         display.DataSources[j].AutoScaleY = true;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
+
                         break;
 
                     case "ANIMATED_AUTO":
@@ -362,11 +493,17 @@ namespace TestniEKG
                         display.DataSources[j].Length = vrijeme.Count;
                         display.DataSources[j].AutoScaleY = false;
                         display.DataSources[j].AutoScaleX = true;
-                        display.DataSources[j].SetDisplayRangeY(-2, 2);
+                        display.DataSources[j].SetDisplayRangeY(-3, 3);
                         display.DataSources[j].SetGridDistanceY((float)1);
                         display.DataSources[j].XAutoScaleOffset = 50;
-                        CalcSinusFunction_3(display.DataSources[j], j, 0);
-                        IspisiPodatke(display.DataSources[j], j, vrijeme, napon);
+                        //CalcSinusFunction_3(display.DataSources[j], j, 0);
+                        //IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+
+                        if (j == 0)
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon1);
+                        else
+                            IspisiPodatke(display.DataSources[j], j, vrijeme, napon2);
+
                         break;
                 }
             }
@@ -378,107 +515,19 @@ namespace TestniEKG
 
         }
 
-
-
-
-
-
-
-
-
         
-
-        // Obrisati:
-
-
-        private void noneToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            display.Smoothing = System.Drawing.Drawing2D.SmoothingMode.None;
-        }
-
-        private void antiAliasedToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            display.Smoothing = System.Drawing.Drawing2D.SmoothingMode.AntiAlias;
-        }
-
-        private void highQualityToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            display.Smoothing = System.Drawing.Drawing2D.SmoothingMode.HighQuality;
-        }
-
-        private void highSpeedToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            display.Smoothing = System.Drawing.Drawing2D.SmoothingMode.HighSpeed;
-        }
-
-
-        protected void CalcSinusFunction_0(DataSource src, int idx)
-        {
-            for (int i = 0; i < src.Length; i++)
-            {
-                src.Samples[i].x = i;
-                src.Samples[i].y = (float)(((float)200 * Math.Sin((idx + 1) * (i + 1.0) * 48 / src.Length)));
-            }
-        }
-
-        protected void CalcSinusFunction_1(DataSource src, int idx)
-        {
-            for (int i = 0; i < src.Length; i++)
-            {
-                src.Samples[i].x = i;
-
-                src.Samples[i].y = (float)(((float)20 *
-                                            Math.Sin(20 * (idx + 1) * (i + 1) * 3.141592 / src.Length)) *
-                                            Math.Sin(40 * (idx + 1) * (i + 1) * 3.141592 / src.Length)) +
-                                            (float)(((float)200 *
-                                            Math.Sin(200 * (idx + 1) * (i + 1) * 3.141592 / src.Length)));
-            }
-            src.OnRenderYAxisLabel = RenderYLabel;
-        }
-
-        protected void CalcSinusFunction_2(DataSource src, int idx)
-        {
-            for (int i = 0; i < src.Length; i++)
-            {
-                /*
-                src.Samples[i].x = i;
-
-                src.Samples[i].y = (float)(((float)20 *
-                                            Math.Sin(40 * (idx + 1) * (i + 1) * 3.141592 / src.Length)) *
-                                            Math.Sin(160 * (idx + 1) * (i + 1) * 3.141592 / src.Length)) +
-                                            (float)(((float)200 *
-                                            Math.Sin(4 * (idx + 1) * (i + 1) * 3.141592 / src.Length)));
-                */
-                src.Samples[i].x = i;
-                src.Samples[i].y = i;
-            }
-            src.OnRenderYAxisLabel = RenderYLabel;
-        }
-
-        protected void CalcSinusFunction_3(DataSource ds, int idx, float time)
-        {
-            cPoint[] src = ds.Samples;
-            for (int i = 0; i < src.Length; i++)
-            {
-                src[i].x = i;
-                src[i].y = 200 + (float)((200 * Math.Sin((idx + 1) * (time + i * 100) / 8000.0))) +
-                                +(float)((40 * Math.Sin((idx + 1) * (time + i * 200) / 2000.0)));
-                /**
-                            (float)( 4* Math.Sin( ((time + (i+8) * 100) / 900.0)))+
-                            (float)(28 * Math.Sin(((time + (i + 8) * 100) / 290.0))); */
-            }
-
-        }
-
-
-
-
 
         protected override void OnClosing(CancelEventArgs e)
         {
             display.Dispose();
-
             base.OnClosing(e);
+        }
+
+        protected override void OnClosed(EventArgs e)
+        {
+            mTimer.Stop();
+            mTimer.Dispose();
+            base.OnClosed(e);
         }
 
         private void ApplyColorSchema()
@@ -803,6 +852,8 @@ namespace TestniEKG
             CalcDataGraphs();
             UpdateGraphCountMenu();
         }
+
+        
 
     
     }

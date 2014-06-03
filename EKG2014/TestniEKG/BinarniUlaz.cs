@@ -9,6 +9,7 @@ using System.Collections.Generic;
 using System.Text;
 using System.ComponentModel;
 using System.IO;
+using System.Windows.Forms;
 
 namespace TestniEKG
 {
@@ -42,12 +43,14 @@ namespace TestniEKG
             {
                 file = new FileStream(fileName, FileMode.Open);
                 reader = new BinaryReader(file);
+                fileLength = file.Length;
             }
-            catch (Exception)
+            catch (Exception ex)
             {
                 // vec je otvoren fajl, sve je OK
+                MessageBox.Show("Izuzetak 1: " + ex.ToString());
             }
-            fileLength = file.Length;
+            //fileLength = file.Length;
             short flag = 0;
             long low = 0, high = 0;
             byte[] buf = { 0, 0, 0 };
@@ -100,10 +103,17 @@ namespace TestniEKG
 
         public override void Stop()
         {
-            reader.Close();
-            file.Close();
-            worker.WorkerSupportsCancellation = true;
-            worker.CancelAsync();
+            try
+            {
+                reader.Close();
+                file.Close();
+                worker.WorkerSupportsCancellation = true;
+                worker.CancelAsync();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show("Izuzetak 2: " + ex.ToString());
+            }
         }
     }
 }

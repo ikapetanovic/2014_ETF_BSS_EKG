@@ -13,11 +13,3 @@ C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\20
 C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG2014\TestniEKG\obj\x86\Debug\TestniEKG.Properties.Resources.resources
 C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG2014\TestniEKG\obj\x86\Debug\EKG.csproj.GenerateResource.Cache
 C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG2014\TestniEKG\obj\x86\Debug\EKG.csprojResolveAssemblyReference.cache
-C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG\EKG2014\TestniEKG\obj\x86\Debug\TestniEKG.exe
-C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG\EKG2014\TestniEKG\obj\x86\Debug\TestniEKG.pdb
-C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG\EKG2014\TestniEKG\bin\Debug\TestniEKG.exe
-C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG\EKG2014\TestniEKG\bin\Debug\TestniEKG.pdb
-C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG\EKG2014\TestniEKG\obj\x86\Debug\EKG.csprojResolveAssemblyReference.cache
-C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG\EKG2014\TestniEKG\obj\x86\Debug\TestniEKG.MainForm.resources
-C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG\EKG2014\TestniEKG\obj\x86\Debug\TestniEKG.Properties.Resources.resources
-C:\Users\batoshi\Desktop\Dropbox\2. Fakultet\RI4\2. semestar\BSS\0\Seminarski\2014\I. Kapetanović\EKG\EKG2014\TestniEKG\obj\x86\Debug\EKG.csproj.GenerateResource.Cache

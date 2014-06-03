@@ -38,11 +38,6 @@ namespace TestniEKG
             this.openToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.layoutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.filterToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.noneToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.antiAliasedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.highQualityToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.highSpeedToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.examplesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.normalToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.normalAutoscaledToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -97,20 +92,20 @@ namespace TestniEKG
             // openToolStripMenuItem
             // 
             this.openToolStripMenuItem.Name = "openToolStripMenuItem";
-            this.openToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.openToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.openToolStripMenuItem.Text = "Open";
             this.openToolStripMenuItem.Click += new System.EventHandler(this.openToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(103, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(152, 22);
             this.exitToolStripMenuItem.Text = "Exit";
+            this.exitToolStripMenuItem.Click += new System.EventHandler(this.exitToolStripMenuItem_Click);
             // 
             // layoutToolStripMenuItem
             // 
             this.layoutToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.filterToolStripMenuItem,
             this.examplesToolStripMenuItem,
             this.colorSchemesToolStripMenuItem,
             this.numGraphsToolStripMenuItem,
@@ -118,45 +113,6 @@ namespace TestniEKG
             this.layoutToolStripMenuItem.Name = "layoutToolStripMenuItem";
             this.layoutToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
             this.layoutToolStripMenuItem.Text = "Settings";
-            // 
-            // filterToolStripMenuItem
-            // 
-            this.filterToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.noneToolStripMenuItem,
-            this.antiAliasedToolStripMenuItem,
-            this.highQualityToolStripMenuItem,
-            this.highSpeedToolStripMenuItem});
-            this.filterToolStripMenuItem.Name = "filterToolStripMenuItem";
-            this.filterToolStripMenuItem.Size = new System.Drawing.Size(153, 22);
-            this.filterToolStripMenuItem.Text = "Filter";
-            // 
-            // noneToolStripMenuItem
-            // 
-            this.noneToolStripMenuItem.Name = "noneToolStripMenuItem";
-            this.noneToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
-            this.noneToolStripMenuItem.Text = "None";
-            this.noneToolStripMenuItem.Click += new System.EventHandler(this.noneToolStripMenuItem_Click);
-            // 
-            // antiAliasedToolStripMenuItem
-            // 
-            this.antiAliasedToolStripMenuItem.Name = "antiAliasedToolStripMenuItem";
-            this.antiAliasedToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
-            this.antiAliasedToolStripMenuItem.Text = "AntiAliased";
-            this.antiAliasedToolStripMenuItem.Click += new System.EventHandler(this.antiAliasedToolStripMenuItem_Click);
-            // 
-            // highQualityToolStripMenuItem
-            // 
-            this.highQualityToolStripMenuItem.Name = "highQualityToolStripMenuItem";
-            this.highQualityToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
-            this.highQualityToolStripMenuItem.Text = "High Quality";
-            this.highQualityToolStripMenuItem.Click += new System.EventHandler(this.highQualityToolStripMenuItem_Click);
-            // 
-            // highSpeedToolStripMenuItem
-            // 
-            this.highSpeedToolStripMenuItem.Name = "highSpeedToolStripMenuItem";
-            this.highSpeedToolStripMenuItem.Size = new System.Drawing.Size(141, 22);
-            this.highSpeedToolStripMenuItem.Text = "High Speed";
-            this.highSpeedToolStripMenuItem.Click += new System.EventHandler(this.highSpeedToolStripMenuItem_Click);
             // 
             // examplesToolStripMenuItem
             // 
@@ -385,6 +341,7 @@ namespace TestniEKG
             this.MainMenuStrip = this.menuStrip1;
             this.Name = "MainForm";
             this.Text = "ECG";
+            this.Load += new System.EventHandler(this.MainForm_Load);
             this.menuStrip1.ResumeLayout(false);
             this.menuStrip1.PerformLayout();
             this.ResumeLayout(false);
@@ -396,11 +353,6 @@ namespace TestniEKG
 
         private System.Windows.Forms.MenuStrip menuStrip1;
         private System.Windows.Forms.ToolStripMenuItem layoutToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem filterToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem noneToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem antiAliasedToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem highQualityToolStripMenuItem;
-        private System.Windows.Forms.ToolStripMenuItem highSpeedToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem examplesToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem normalToolStripMenuItem;
         private System.Windows.Forms.ToolStripMenuItem stackedToolStripMenuItem;
