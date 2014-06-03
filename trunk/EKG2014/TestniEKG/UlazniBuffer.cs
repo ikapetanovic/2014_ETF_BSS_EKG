@@ -15,7 +15,7 @@ namespace TestniEKG
         TEXT
     };
 
-    public static class UlazniBuffer
+    public class UlazniBuffer // static
     {
         private static int MAX_BUFFER_SIZE = 75;
         private static double[] buffer = new double[MAX_BUFFER_SIZE];
