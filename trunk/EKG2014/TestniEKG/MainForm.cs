@@ -115,7 +115,7 @@ namespace TestniEKG
 
         private String RenderYLabel(DataSource s, float value)
         {
-            return String.Format("{0:0.0}", (float)value/10); // /100
+            return String.Format("{0:0.0}", (float)value); // /100
         }
 
                
@@ -148,7 +148,7 @@ namespace TestniEKG
             try
             {
                 UlazniBuffer.Open(filePath, 0, type);
-                timer.Change(0, 30);
+                timer.Change(0, 60000); // 30
                 Thread.Sleep(10000);
             }
             catch (Exception izuzetak)
@@ -163,8 +163,8 @@ namespace TestniEKG
             try
             {
                 UlazniBuffer.Open(filePath, 1, type);
-                timer.Change(0, 30);
-                Thread.Sleep(10000);
+                timer.Change(0, 60000); // 30
+                Thread.Sleep(10000); //10000
             }
             catch (Exception izuzetak)
             {
@@ -176,8 +176,8 @@ namespace TestniEKG
         {
             
             //System.Console.WriteLine("tick");
-            double[] signal = new double[100]; //10
-            for (int i = 0; i < 100; i++) // 10
+            double[] signal = new double[20000]; //10
+            for (int i = 0; i < 20000; i++) // 10
             {
                 while (!UlazniBuffer.ReadOne(out signal[i])) ;
                 //Console.Write("3");
@@ -200,8 +200,8 @@ namespace TestniEKG
         {
 
             //System.Console.WriteLine("tick");
-            double[] signal = new double[100]; //10
-            for (int i = 0; i < 100; i++) // 10
+            double[] signal = new double[20000]; //10
+            for (int i = 0; i < 20000; i++) // 10
             {
                 while (!UlazniBuffer.ReadOne(out signal[i])) ;
                 //Console.Write("3");
@@ -223,8 +223,8 @@ namespace TestniEKG
         {
             //System.Console.WriteLine("tick");
             double[] signal = new double[10];
-            while (!UlazniBuffer.ReadMany(out signal, 10)) ;
-            for (int i = 0; i < 10; i++)
+            while (!UlazniBuffer.ReadMany(out signal, 1000)) ;
+            for (int i = 0; i < 1000; i++)
             {
                 //Console.Write("3");
                 if (signal[i] == Double.PositiveInfinity)
@@ -248,7 +248,7 @@ namespace TestniEKG
             display.DataSources.Clear();
             //display.SetDisplayRangeX(0, 2000);
             display.SetDisplayRangeX(0, 3);
-            display.SetGridDistanceX((float)0.5);
+            display.SetGridDistanceX((float)0.2);
 
             for (int j = 0; j < NumGraphs; j++)
             {
